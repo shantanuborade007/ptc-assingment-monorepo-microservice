@@ -16,102 +16,6 @@ export class WorkerService {
               @Inject(BLOB_SERVICE) private blobClient:ClientProxy
   ){}
 
-  async createJob(jobData:JobDto){
-    const {imgURL,status} = jobData
-
-    /*following info is for demo only , yaha 
-      user ke jwt se data fetch hoga !!!
-    */
-     const userId= "demoId"
-     const tenetId ="demoId"
-     const clientId = "demoID"
-     const job =  this.jobRepository.create({
-      imgURL,
-      status,
-      userId,
-      tenetId,
-      clientId
-    })
-
-    return job
-  }
-
-  async getJob(){
-    return this.jobRepository.find({})
-  }
-
-
- async createJob2(jobData:JobDto){
-    const session = await this.jobRepository.startTransaction();
-     /*following info is for demo only , yaha 
-      user ke jwt se data fetch hoga !!!
-    */
-      const userId= "demoId"
-      const tenetId ="demoId"
-      const clientId = "demoID"
-    try{
-      const {imgURL,status} = jobData
-      const job = await this.jobRepository.create({
-        imgURL,
-        status,
-        userId,
-        tenetId,
-        clientId
-      },{session});
-
-      await lastValueFrom(
-        this.blobClient.emit('job_created',{
-          jobData
-        })
-      );
-
-      await session.commitTransaction()
-      return job
-
-    }catch(err){
-      await session.abortTransaction()
-      throw err;
-    }
- }
-
-
- async createJob3(jobData:JobDto){
-  const session = await this.jobRepository.startTransaction();
-     /*following info is for demo only , yaha 
-      user ke jwt se data fetch hoga !!!
-    */
-      const userId= "demoId"
-      const tenetId ="demoId"
-      const clientId = "demoID"
-    try{
-      const {imgURL,status} = jobData
-      const job = await this.jobRepository.create({
-        imgURL,
-        status,
-        userId,
-        tenetId,
-        clientId
-      },{session});
-
-      const md5='this is demomd5'
-      const content='this is demo content'
-      const jobData1 ={md5,content}
-      console.log(jobData1)
-      await lastValueFrom(
-        this.blobClient.emit('job_created2',{
-          jobData1
-        })
-      );
-
-      await session.commitTransaction()
-      return job
-
-    }catch(err){
-      await session.abortTransaction()
-      throw err;
-    }
- }
-
  async processImage(file: Express.Multer.File): Promise<{ content: string; md5: string }> {
   if (!file) {
     throw new NotFoundException('No image file uploaded');
@@ -135,11 +39,13 @@ export class WorkerService {
 
       try{
         const data = await lastValueFrom(
-          await this.blobClient.emit('job_created2',{
+          await this.blobClient.send('job_created2',{
             processedImage
           })
         );
-        const imgURL = 'demourl'
+
+        
+        const imgURL = data._id
         const job = this.jobRepository.create({
           imgURL,
           status,

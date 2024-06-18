@@ -22,25 +22,6 @@ const multerOptions: MulterOptions = {
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
 
-  @Post('demo/job')
-  async createJob(@Body() jobDto:JobDto){
-    return this.workerService.createJob(jobDto);
-  }
-
-  @Post('demo/job2')
-  async createJob2(@Body() jobDto:JobDto){
-    return this.workerService.createJob2(jobDto);
-  }
-
-  //ithe demo/jobs3
-  @Post('demo/jobs3')
-  async createJob3(@Body() jobDto:JobDto){
-    return this.workerService.createJob3(jobDto);
-  }
-  @Get('getjobs')
-  async getJobs(){
-    return this.workerService.getJob();
-  }
 
   @Post('api/v1/job')
   @UseInterceptors(FileInterceptor('image',multerOptions))

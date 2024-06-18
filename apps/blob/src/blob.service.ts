@@ -15,12 +15,8 @@ export class BlobService {
     return 'Hello World!';
   }
 
-  async createBlob(data:any){
-    this.logger.log('Calling...',data);
-  }
-
   async createBlob2(data:any){
-     console.log(data)
+    //  console.log(data)
     //  const { content, md5 } = processedImage;
      const md5 = data.processedImage.md5
      const content = data.processedImage.content;
@@ -32,7 +28,7 @@ export class BlobService {
       encoding:'base64',
     })
     
-    console.log(blob);
+    // console.log(blob);
     return blob;
   }
 }

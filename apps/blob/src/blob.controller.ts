@@ -11,10 +11,7 @@ export class BlobController {
     return this.blobService.getHello();
   }
 
-  @EventPattern('job_created')
-  async handleJobCreated(@Payload() data:any,@Ctx() context:RmqContext){
-    this.blobService.createBlob(data)
-  }
+
 
   @EventPattern('job_created2')
   async handleJobCreated2(@Payload() data:any,@Ctx() context:RmqContext){
