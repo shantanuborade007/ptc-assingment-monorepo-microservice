@@ -8,12 +8,14 @@ import { lastValueFrom } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
+const {ObjectId} = require('mongodb');
+
 
 @Injectable()
 export class WorkerService {
 
   constructor(private readonly jobRepository:JobRepository,
-              @Inject(BLOB_SERVICE) private blobClient:ClientProxy
+              @Inject(BLOB_SERVICE) private blobClient:ClientProxy,
   ){}
 
  async processImage(file: Express.Multer.File): Promise<{ content: string; md5: string }> {
@@ -31,11 +33,11 @@ export class WorkerService {
   return { content, md5 };
 } 
 
-  async createJobMain(processedImage:any,status:string){
+  async createJobMain(processedImage:any,status:string,user:any){
     const session = await this.jobRepository.startTransaction();
-    const userId= "demoId"
-      const tenetId ="demoId"
-      const clientId = "demoID"
+    const userId= user._id;
+      const tenetId =user.tenetId;
+      const clientId = user.clientId;
 
       try{
         const data = await lastValueFrom(
@@ -55,6 +57,8 @@ export class WorkerService {
         },{session})
 
       await session.commitTransaction()
+      
+
       return job
         
       }catch(err){
@@ -62,5 +66,16 @@ export class WorkerService {
         throw err;
       }
   }
+
+  async findByid(id:string):Promise<Job>{
+    const newId = new ObjectId(id)
+    return await this.jobRepository.findOne(newId);
+}
+
+async findJobStatus(id:string):Promise<any>{
+    const newId = new ObjectId(id)
+    const job = await this.jobRepository.findOne(newId);
+    return job.status
+} 
 
 }
